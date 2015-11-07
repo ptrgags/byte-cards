@@ -28,10 +28,6 @@ module ByteCardsFunctional
         card >> 6 & (WILDS - 1)
     end
 
-    def rank_cmp card1, card2
-        rank(card1) <=> rank(card2)
-    end
-
     def name card, rank_names: RANK_NAMES, suit_names: SUIT_NAMES, wild_names: []
         "#{rank_names[rank card]} of #{suit_names[suit card]}"
     end
@@ -63,11 +59,27 @@ module ByteCardsFunctional
         [bottom, top]
     end
 
-    def draw deck, n=1
+    def draw deck, n = 1
         if n == 1
             deck.pop
         else
             deck.pop n
         end
+    end
+
+    def draw_bottom deck, n = 1
+        if n == 1
+            deck.shift
+        else
+            deck.shift n
+        end
+    end
+
+    def add_top deck, cards
+        deck.push *cards
+    end
+
+    def add_bottom deck, cards
+        deck.unshift *cards
     end
 end

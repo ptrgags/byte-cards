@@ -27,12 +27,23 @@ class ByteCardDeck
         [bottom, top]
     end
 
-    #Draw n card
-    def draw n=1
+    #Draw cards from the top of the deck (push/pop end)
+    #n - number of cards to draw.
+    #returns a single ByteCard if n == 1, else returns
+    #an array of ByteCards of length n
+    def draw n = 1
         if n == 1
             @deck.pop
         else
             @deck.pop n
+        end
+    end
+
+    def draw_bottom n = 1
+        if n == 1
+            @deck.shift
+        else
+            @deck.shift n
         end
     end
 
@@ -50,5 +61,20 @@ class ByteCardDeck
 
     def inspect
         "ByteCardDeck<#{@deck.inspect}>"
+    end
+
+    def self.make_deck num_suits: ByteCard::SUITS, num_ranks: ByteCard::RANKS, num_wilds: 1, shuffle: true
+        suits = *(0...num_suits)
+        ranks = *(0...num_ranks)
+        wilds = *(0...num_wilds)
+        cards = suits.product(ranks, wilds).map do |suit, rank, wild|
+            ByteCard.new suit: suit, rank: rank, wild: wild
+        end
+
+        if shuffle
+            self.new cards.shuffle
+        else
+            self.new cards
+        end
     end
 end

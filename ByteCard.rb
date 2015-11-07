@@ -1,8 +1,11 @@
 class ByteCard
-    include Comparable
     RANKS=16
     SUITS=4
     WILDS=4
+    RANK_NAMES = "0123456789ABCDEF"
+    SHORT_RANK_NAMES = RANK_NAMES
+    SUIT_NAMES = ["Spades", "Hearts", "Clubs", "Diamonds"]
+    SHORT_SUIT_NAMES = "shcd"
 
     def initialize value: -1, rank: 0, suit: 0, wild: 0
         if value >= 0
@@ -31,19 +34,11 @@ class ByteCard
         @value >> 6 & (WILDS - 1)
     end
 
-    #By default, when we compare cards, we compare
-    #only the ranks
-    def <=> other
-        rank <=> other.rank
-    end
-
-    #Default representation. Override in subclass for game specific
-    #information.
     def to_s
-        "#{rank} of #{suit} (Wild: #{wild})"
+        "#{RANK_NAMES[rank]} of #{SUIT_NAMES[suit]}"
     end
 
     def inspect
-        "ByteCard<#{@value}: Rank: #{rank} Suit: #{suit} Wild: #{wild}>"
+        "#{SHORT_RANK_NAMES[rank]}#{SHORT_SUIT_NAMES[suit]}"
     end
 end

@@ -1,10 +1,11 @@
 #!/usr/bin/env ruby
-#Test of ByteCard and Deck in OO style.
+#Test of ByteCard and Deck in functional style
 #Goal: Play a game of War vs the computer
 
 require_relative "byte_cards"
 include ByteCardsFunctional
 
+#Gather all cards and split into two decs
 all_cards = make_deck
 player_deck, cpu_deck = cut all_cards
 
@@ -15,11 +16,11 @@ cpu_card = draw cpu_deck
 puts "CPU draws: #{name cpu_card}"
 player_card = draw player_deck
 puts "Player draws: #{name player_card}"
-case rank_cmp cpu_card, player_card
-when 0
+
+if rank(cpu_card) == rank(player_card)
     puts "WAR!"
-when 1
+elsif rank(cpu_card) > rank(player_card)
     puts "CPU Wins!"
-when -1
+else
     puts "Player wins!"
 end
