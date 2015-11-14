@@ -1,17 +1,21 @@
 My desired output for Crazy Eights:
 
 Welcome to Crazy Eights!
-Today we have 2 players, Player 1 and Player 2
-<press Enter>
-Deck was created and shuffled with 64 cards
-Dealt 5 cards to each player.
-Creating the second pile.
-The top card is the [x of x]
-Player 1, press Enter when ready
+Today we have 2 players, Player 1 and Player 2!
 <press Enter>
 <clear screen>
-Player 2 has x cards
-Top card: [x of x]
+Deck was created and shuffled with 64 cards.
+Dealt 5 cards to each player.
+Creating the center pile.
+The top card is the x of x.
+<press Enter>
+<clear screen>
+Player 1's Turn:
+
+Player 1 has x cards.
+Player 2 has x cards.
+
+Top card: x of x
 
 Your Hand:
 0 - x of x

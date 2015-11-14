@@ -45,8 +45,47 @@
 	(doseq [[i x] (enumerate hand)]
 		(println (format "%d) %s" i (card-name x)))))
 
-;Test what we have so far
+;Wait for the user to press enter
+(defn wait-enter []
+	(do 
+		(print "Press Enter to continue ")
+		(flush)
+		(read-line)))
 
+;Print \e[2J to clear the screen
+(defn clear-screen []
+	(do 
+		(print "\u001B[2J")
+		(flush)))
+
+;Print a welcome message
+(defn game-welcome []
+	(do
+		(println "Welcome to Crazy Eights!")
+		(println "Today we have 2 players, Player 1 and Player 2!")
+		(wait-enter)
+		(clear-screen)))
+
+;Setup the game
+(defn game-setup []
+	(let [[hand1 hand2 table deck] (setup (deck-create))
+		top-card (first table)]
+		(println "Deck was created with 64 cards and then shuffled")
+		(println "Dealt 5 cards to each player")
+		(println "Creating the center pile")
+		(println (format "The top card is the %s" (card-name top-card)))
+		[hand1 hand2 table deck]))
+
+;Test what we have so far
+(game-welcome)
+(println (game-setup))
+
+;Desired API:
+;(game-welcome)
+;(game-loop (game-setup))
+
+(wait-enter)
+(clear-screen)
 (println "Choosing cards to play====")
 (let [
 	[hand1 hand2 table deck] (setup (deck-create))
@@ -60,6 +99,9 @@
 	(hand-show valid)
 	(println "Invalid cards:")
 	(hand-show invalid))
+
+(wait-enter)
+(clear-screen)
 
 (println "Drawing cards=====")
 (let [
