@@ -40,7 +40,7 @@
 
 ;Check if a card is playable given the top card
 ;in the pile
-(defn playable [card pile]
+(defn playable? [card pile]
 	(let [top (first pile)]
 		(or
 			(= (card-rank card) 8)
@@ -56,14 +56,14 @@
 			(cond
 				(empty? top-deck)
 					(recur hand top-pile (seq (shuffle rest-pile)))
-				(playable (first top-deck) pile)
+				(playable? (first top-deck) pile)
 					[hand (concat top-deck pile) rest-deck]
 				:else
 					(recur (concat hand top-deck) pile rest-deck)))))
 		  
 ;Get a list of cards that are playable in the hand
 (defn valid-cards [hand pile]
-	(filter (fn [x] (playable x pile)) hand))
+	(filter (fn [x] (playable? x pile)) hand))
 
 ;Pick a random card from the hand.
 (defn random-card [hand]
