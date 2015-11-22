@@ -23,6 +23,7 @@
 			(deal-pile (shuffle deck))
 			(deck-draw deck))))
 
+;Set up the initial game state
 (defn setup []
 	(let [
 		deck (deck-create)
@@ -47,16 +48,19 @@
 			(= (card-suit card) (card-suit top)))))
 
 ;Draw cards from the deck until one can be played on the pile
-;TODO: Fix infinite loop caused by empty deck
 (defn draw-until-playable [hand pile deck]
-	(let [
-		split-fn (fn [x] (not (playable x pile)))
-		[bad-cards deck] (split-with split-fn  deck)
-		[pile-card deck] (deck-draw deck)
-		hand (concat hand bad-cards)
-		pile (concat pile-card pile)]
-		[hand pile deck]))
-
+	(loop [hand hand pile pile deck deck]
+		(let [
+			[top-pile rest-pile] (split-at 1 pile)
+			[top-deck rest-deck] (split-at 1 deck)]
+			(cond
+				(empty? top-deck)
+					(recur hand top-pile (seq (shuffle rest-pile)))
+				(playable (first top-deck) pile)
+					[hand (concat top-deck pile) rest-deck]
+				:else
+					(recur (concat hand top-deck) pile rest-deck)))))
+		  
 ;Get a list of cards that are playable in the hand
 (defn valid-cards [hand pile]
 	(filter (fn [x] (playable x pile)) hand))
