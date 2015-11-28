@@ -1,16 +1,6 @@
 #!/usr/bin/clojure
 (load-file "../byte_cards.clj")
-
-(comment
-(defn current-hand
-  "Get the current player's hand
-  
-  state -- the current state map
-
-  returns the list of card that
-    represents the current player's hand"
-  [{:keys [hands player]}]
-  (nth hands player)))
+(load-file "../card_structures.clj")
 
 (defn wait-enter 
   "Taunt the user to press enter"
@@ -46,14 +36,6 @@
   [coll]
   (map vector (range) coll))
 
-(defn hand-show 
-  "Display a hand in enumerated fashion
-
-  hand -- the hand to display"
-  [hand]
-  (doseq [[i x] (enumerate hand)]
-    (println (format "%d) %s" i (card-name x)))))
-
 (defn read-int 
   "Read an integer from stdin and return -1 on exceptions"
   []
@@ -62,32 +44,6 @@
    (flush)
    (Integer/parseInt (read-line))
    (catch Exception e -1)))
-
-(defn deck-create 
-  "Create and shuffle a deck of cards
-
-  returns a list that represents the deck"
-  []
-  (seq (shuffle (range 0 64))))
-
-(defn deck-draw
-  "Draw a card or multiple cards
-  
-  deck -- the original deck
-  n -- the number of cards (default 1)
-
-  returns [cards deck] where deck has n less cards"
-  ([deck] (split-at 1 deck))
-  ([deck n] (split-at n deck)))
-
-(defn deal-hand 
-  "Deal a hand of 7 cards
-  
-  deck -- the deck
-
-  returns [hand deck]"
-  [deck]
-  (deck-draw deck 7))
 
 (defn deal-pile 
   "Deal the first card to the pile.
@@ -126,8 +82,8 @@
     turn -- (int) turn number. Starts at 1"
   []
   (let [deck (deck-create)
-        [hand1 deck] (deal-hand deck)
-        [hand2 deck] (deal-hand deck)
+        [hand1 deck] (deal-hand deck 7)
+        [hand2 deck] (deal-hand deck 7)
         [pile deck] (deal-pile deck)
          hands [hand1 hand2]]
     (game-welcome)
@@ -308,14 +264,6 @@
     (choose-card-human valids)
     (choose-card-ai valids)))
   
-(defn hand-remove-card
-  "Remove a card from a hand
-
-  hand -- the hand of cards
-  card -- the card to remove"
-  [hand card]
-  (remove #(= card %) hand))
-
 (defn play-selection
   "Have the player select a card and then 
   play it
@@ -328,7 +276,7 @@
   (let [hand (nth hands player)
         valids (valid-cards hand pile wild-suit)
         card (choose-card valids player)
-        hand (hand-remove-card hand card)
+        hand (hand-remove hand card)
         [pile wild-suit] (play-card card pile player)
         hands (assoc hands player hand)]
     (merge state {:hands hands :pile pile :wild-suit wild-suit})))
