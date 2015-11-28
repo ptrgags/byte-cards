@@ -94,7 +94,7 @@
   "Desplay a message about the card that
   was last played"
   [card]
-  (println (format "Played the %s" (card-name card))))
+  (printf "Played the %s\n" (card-name card)))
 
 (defn choose-wild-suit-ai
   "Have the AI select a random suit"
@@ -107,7 +107,7 @@
   (try
    (println "Pick a suit:")
    (doseq [[i x] (enumerate SUIT_NAMES)]
-    (println (format "%d) %s" i x)))
+    (printf "%d) %s\n" i x))
    (let [suit (read-int)]
      (nth SUIT_NAMES suit)
      suit)
@@ -139,7 +139,7 @@
      (do
       (println "A wild 8 was played!")
       (let [suit (choose-wild-suit player)]
-        (println (format "Chose suit %s" (get SUIT_NAMES suit)))
+        (printf "Chose suit %s\n" (get SUIT_NAMES suit))
         (wait-enter)
         (clear-screen)
         [(cons card pile) suit]))
@@ -312,14 +312,14 @@
   state -- the current state map"
   [{:keys [turn player hands pile wild-suit] :as state}]
   (do
-   (println (format "Turn %s - Player %s's turn=====" turn (inc player)))
+   (printf "Turn %s - Player %s's turn=====\n" turn (inc player))
    ;TODO: Support more than 2 players
-   (println (format "Player 1 has %d cards" (count (nth hands 0))))
-   (println (format "Player 2 has %d cards" (count (nth hands 1))))
+   (printf "Player 1 has %d cards\n" (count (nth hands 0)))
+   (printf "Player 2 has %d cards\n" (count (nth hands 1)))
    (println)
-   (println (format "Top card: %s" (card-name (first pile))))
+   (printf "Top card: %s\n" (card-name (first pile)))
    (when (not (nil? wild-suit))
-     (println (format "Wild suit: %s" (get SUIT_NAMES wild-suit))))
+     (printf "Wild suit: %s\n" (get SUIT_NAMES wild-suit)))
    (println)))
 
 (defn next-turn 
