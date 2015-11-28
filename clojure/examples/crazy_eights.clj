@@ -1,6 +1,17 @@
 #!/usr/bin/clojure
 (load-file "../byte_cards.clj")
 
+(comment
+(defn current-hand
+  "Get the current player's hand
+  
+  state -- the current state map
+
+  returns the list of card that
+    represents the current player's hand"
+  [{:keys [hands player]}]
+  (nth hands player)))
+
 (defn wait-enter 
   "Taunt the user to press enter"
   []
@@ -26,23 +37,19 @@
     (clear-screen)))
 
 (defn enumerate 
-  "
-  Enumerate a sequence
+  "Enumerate a sequence
   
   coll -- the collection to enumerate
 
   returns a sequence of vectors [i x] where 
-    i is the index and x is the value
-  "
+    i is the index and x is the value"
   [coll]
   (map vector (range) coll))
 
 (defn hand-show 
-  "
-  Display a hand in enumerated fashion
+  "Display a hand in enumerated fashion
 
-  hand -- the hand to display
-  "
+  hand -- the hand to display"
   [hand]
   (doseq [[i x] (enumerate hand)]
     (println (format "%d) %s" i (card-name x)))))
@@ -57,49 +64,40 @@
    (catch Exception e -1)))
 
 (defn deck-create 
-  "
-  Create and shuffle a deck of cards
+  "Create and shuffle a deck of cards
 
-  returns a list that represents the deck
-  "
+  returns a list that represents the deck"
   []
   (seq (shuffle (range 0 64))))
 
 (defn deck-draw
-  "
-  Draw a card or multiple cards
+  "Draw a card or multiple cards
   
   deck -- the original deck
   n -- the number of cards (default 1)
 
-  returns [cards deck] where deck has n less cards
-  "
+  returns [cards deck] where deck has n less cards"
   ([deck] (split-at 1 deck))
   ([deck n] (split-at n deck)))
 
-;Deal 7 cards for a single player
 (defn deal-hand 
-  "
-  Deal a hand of 7 cards
+  "Deal a hand of 7 cards
   
   deck -- the deck
 
-  returns [hand deck]
-  "
+  returns [hand deck]"
   [deck]
   (deck-draw deck 7))
 
 (defn deal-pile 
-  "
-  Deal the first card to the pile.
+  "Deal the first card to the pile.
   If the first card is an 8, reshuffle
   and try again
 
   deck -- the original deck
   
   returns [pile deck] where one card was
-    moved from deck to pile
-  "
+    moved from deck to pile"
   [deck]
   (let [top (first deck)]
     (if (= (card-rank top) 8)
@@ -117,8 +115,7 @@
    (clear-screen)))
 
 (defn setup 
-  "
-  Set up the initial game state
+  "Set up the initial game state
 
   returns a state map with the following keys:
     deck -- (list) newly created deck minus cards dealt
@@ -126,8 +123,7 @@
     pile -- (list) center pile, starts with 1 card
     player -- (int) current player index
     wild-suit -- (int) wild suit when an 8 is played. starts at nil.
-    turn -- (int) turn number. Starts at 1
-  "
+    turn -- (int) turn number. Starts at 1"
   []
   (let [deck (deck-create)
         [hand1 deck] (deal-hand deck)
@@ -138,56 +134,90 @@
     (print-setup)
     {:deck deck :hands hands :pile pile :player 0 :wild-suit nil :turn 1}))
 
+(defn print-played-card
+  "Desplay a message about the card that
+  was last played"
+  [card]
+  (println (format "Played the %s" (card-name card))))
+
+(defn choose-wild-suit-ai
+  "Have the AI select a random suit"
+  []
+  (rand-int 4))
+
+(defn choose-wild-suit-human
+  "Have a human player select a wild suit"
+  []
+  (try
+   (println "Pick a suit:")
+   (doseq [[i x] (enumerate SUIT_NAMES)]
+    (println (format "%d) %s" i x)))
+   (let [suit (read-int)]
+     (nth SUIT_NAMES suit)
+     suit)
+   (catch IndexOutOfBoundsException e (choose-wild-suit-human))))
+     
+
+(defn choose-wild-suit
+  "Have the player select a wild suit"
+  [player]
+  (if (= player 0)
+    (choose-wild-suit-human)
+    (choose-wild-suit-ai)))
 
 (defn play-card
-  "
-  Play a card onto the pile and update the
+  "Play a card onto the pile and update the
     wild suit
 
   card -- the card (integer)
   pile -- the pile (list)
+  player -- the player index (integer). used to figure out
+    if the player is human or AI
 
   returns updated state variables: 
-    [pile wild-suit]
-  "
-  [card pile]
-  ;TODO: Move IO to separate function
+    [pile wild-suit]"
+  [card pile player]
   (do
-   (println (format "Played the %s" (card-name card)))
-   (wait-enter)
-   (clear-screen)
-   [(cons card pile) nil]))
-   
+   (print-played-card card)
+   (if (= (card-rank card) 8)
+     (do
+      (println "A wild 8 was played!")
+      (let [suit (choose-wild-suit player)]
+        (println (format "Chose suit %s" (get SUIT_NAMES suit)))
+        (wait-enter)
+        (clear-screen)
+        [(cons card pile) suit]))
+     (do
+      (wait-enter)
+      (clear-screen)
+      [(cons card pile) nil]))))
 
 (defn playable? 
-  "
-  Check if a card is playable given the
-  top card in the pile
+  "Check if a card is playable given the
+    top card in the pile
 
   card -- the top card
   pile -- the current pile
 
-  returns true if the card is playable
-  "
-  [card pile]
+  returns true if the card is playable"
+  [card pile wild-suit]
   (let [top (first pile)]
-  (or
-   (= (card-rank card) 8)
-   (= (card-rank card) (card-rank top))
-   (= (card-suit card) (card-suit top)))))
+    (or
+     (= (card-rank card) 8)
+     (= (card-rank card) (card-rank top))
+     (= (card-suit card) (if (nil? wild-suit) (card-suit top) wild-suit)))))
 
 (defn draw-until-playable-helper
-  "
-  Loop to draw cards until a playable one is found.
+  "Loop to draw cards until a playable one is found.
 
   hand -- the current player's hand
   pile -- the ceter pile
   deck -- the deck
   player -- the current player index
+  wild-suit -- the current wild suit number
 
-  returns updated [hand pile deck wild-suit]
-  "
-  [hand pile deck player]
+  returns updated [hand pile deck wild-suit]"
+  [hand pile deck player wild-suit]
   (loop [hand hand 
          pile pile 
          deck deck]
@@ -198,64 +228,57 @@
        (empty? top-deck) (recur hand top-pile (seq (shuffle rest-pile)))
        ;If the first card in the deck is playable, play it directly
        ;to the pile
-       (playable? (first top-deck) pile) 
-       (let [[pile wild-suit] (play-card (first top-deck) pile)]
+       (playable? (first top-deck) pile wild-suit) 
+       (let [[pile wild-suit] (play-card (first top-deck) pile player)]
          [hand pile rest-deck wild-suit])
        ;Otherwise, put the top card in the player's hand andd try again
        :else (recur (concat hand top-deck) pile rest-deck)))))
 
 (defn print-no-valid-cards-message
-  "
-  Print a message indicating that the user
+  "Print a message indicating that the user
   has no playable cards in his hand and has
-  to draw for them.
-  "
+  to draw for them."
   []
   (do 
    (println "No playable cards in hand.") 
    (println "Drawing cards until a playable card is found.")))
 
 (defn draw-until-playable
-  "
-  Draw cards until one can be played
+  "Draw cards until one can be played
   
   state -- the current state map
 
-  returns the updated state map after drawing cards.
-  "
-  [{:keys [hands pile deck player] :as state}]
+  returns the updated state map after drawing cards."
+  [{:keys [hands pile deck player wild-suit] :as state}]
   (do
    (print-no-valid-cards-message))
    (let [hand (nth hands player)
-         [hand pile deck wild-suit] (draw-until-playable-helper hand pile deck player)
+         [hand pile deck wild-suit] (draw-until-playable-helper hand pile deck player wild-suit)
          hands (assoc hands player hand)]
      (merge state {:hands hands :pile pile :deck deck :wild-suit wild-suit})))
 
 (defn valid-cards 
-  "
-  Get a list of cards that are playable from a hand given the 
+  "Get a list of cards that are playable from a hand given the 
   center pile
 
   hand -- the player's hand
   pile -- the center pile
+  wild-suit -- the current wild suit number
 
   returns a list of all the cards that can be placed
-  on the pile
-  "
-  [hand pile]
-  (filter #(playable? % pile) hand))
+  on the pile"
+  [hand pile wild-suit]
+  (filter #(playable? % pile wild-suit) hand))
 
 ;TODO: Can this be an alias for rand-nth instead of a defn?
 (defn choose-card-ai
-  "
-  Choose a random card from a hand of cards.
+  "Choose a random card from a hand of cards.
   This is meant for the AI at the lowest
   difficulty setting.
 
   hand -- the player's hand
 
-  returns a random card from the list hand
-  "
+  returns a random card from the list hand"
   [hand]
   (rand-nth hand))
 
@@ -270,8 +293,7 @@
    (catch IndexOutOfBoundsException e (choose-card-human hand))))
 
 (defn choose-card
-  "
-  Choose a card in a way that reflect's the
+  "Choose a card in a way that reflect's the
   player's status as a human or AI.
 
   valids -- the valid cards to choose from
@@ -279,8 +301,7 @@
     if we should delegate to the AI or human 
     choosing function
 
-  returns the selected card
-  "
+  returns the selected card"
   [valids player]
   ;TODO: Allow for more than 2 players
   (if (= player 0)
@@ -288,38 +309,32 @@
     (choose-card-ai valids)))
   
 (defn hand-remove-card
-  "
-  Remove a card from a hand
+  "Remove a card from a hand
 
   hand -- the hand of cards
-  card -- the card to remove
-  "
+  card -- the card to remove"
   [hand card]
   (remove #(= card %) hand))
 
 (defn play-selection
-  "
-  Have the player select a card and then 
+  "Have the player select a card and then 
   play it
   
   state -- the current state map
 
   returns the updated state map after the cards
-    have been played
-  "
-  [{:keys [hands pile player] :as state}]
+    have been played"
+  [{:keys [hands pile player wild-suit] :as state}]
   (let [hand (nth hands player)
-        valids (valid-cards hand pile)
+        valids (valid-cards hand pile wild-suit)
         card (choose-card valids player)
         hand (hand-remove-card hand card)
-        [pile wild-suit] (play-card card pile)
+        [pile wild-suit] (play-card card pile player)
         hands (assoc hands player hand)]
     (merge state {:hands hands :pile pile :wild-suit wild-suit})))
 
 (defn print-human-hand 
-  "
-  Print the cards in the player's hand
-  "
+  "Print the cards in the player's hand"
   [hand]
   (do
    (println "Your cards:")
@@ -327,17 +342,15 @@
    (println)))
 
 (defn player-turn
-  "
-  Have the player take a turn
+  "Have the player take a turn
 
   state -- the current state map
 
   returns an updated state map
-    with the results of the player's turn
-  "
-  [{:keys [hands pile turn player] :as state}]
+    with the results of the player's turn"
+  [{:keys [hands pile turn player wild-suit] :as state}]
   (let [hand (nth hands player)
-        valids (valid-cards hand pile)]
+        valids (valid-cards hand pile wild-suit)]
     ;TODO: This should check if a player is human, not just Player 1
     (when (= player 0)
       (print-human-hand hand))
@@ -346,12 +359,10 @@
         (play-selection state))))
 
 (defn print-game-state
-  "
-  Print a quick summary of the current game state
+  "Print a quick summary of the current game state
 
-  state -- the current state map
-  "
-  [{:keys [turn player hands pile] :as state}]
+  state -- the current state map"
+  [{:keys [turn player hands pile wild-suit] :as state}]
   (do
    (println (format "Turn %s - Player %s's turn=====" turn (inc player)))
    ;TODO: Support more than 2 players
@@ -359,58 +370,52 @@
    (println (format "Player 2 has %d cards" (count (nth hands 1))))
    (println)
    (println (format "Top card: %s" (card-name (first pile))))
+   (when (not (nil? wild-suit))
+     (println (format "Wild suit: %s" (get SUIT_NAMES wild-suit))))
    (println)))
 
 (defn next-turn 
-  "
-  Increment the turn counter and cycle through
+  "Increment the turn counter and cycle through
   the players
 
   state -- the game state map
 
   returns a state map with updated
-  :turn and :player keys
-  "
+  :turn and :player keys"
   [{:keys [turn player] :as state}]
   (let [player (if (= player 0) 1 0) ;TODO: Handle more than 2 players
         turn (inc turn)]
     (merge state {:turn turn :player player})))
 
 (defn game-turn
-  "
-  Advance the game by one turn, either
+  "Advance the game by one turn, either
   player or AI
 
   state -- the game state map
   
-  returns an updated state map
-  "
+  returns an updated state map"
   [{player :player :as state}]
   (do
    (print-game-state state)
    (next-turn (player-turn state))))
 
 (defn game-over? 
-  "
-  Check if the game is over
+  "Check if the game is over
   (i.e. one of the two hands is empty)
 
   state -- the state map
 
-  returns true if the game is over
-  "
+  returns true if the game is over"
   [{hands :hands}]
   (or
    (empty? (nth hands 0))
    (empty? (nth hands 1))))
 
 (defn declare-winner 
-  "
-  Declare the winner depending on which hand in hands is
+  "Declare the winner depending on which hand in hands is
   empty
 
-  state -- the game state map
-  "
+  state -- the game state map"
   [{hands :hands}]
   ;TODO: Handle more than two players
   ;TODO: Better way to access a player's hand?
