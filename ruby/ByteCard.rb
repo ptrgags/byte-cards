@@ -1,3 +1,10 @@
+#ByteCard, a card that fits in a byte
+#Each card is represented by a single byte
+#in the format WW SS RRRR
+#where:
+#   WW - wild bits (User-defined)
+#   SS - suit index 0-3
+#   RRRR - rank index 0-15
 class ByteCard
     RANKS=16
     SUITS=4
@@ -7,11 +14,11 @@ class ByteCard
     SUIT_NAMES = ["Spades", "Hearts", "Clubs", "Diamonds"]
     SHORT_SUIT_NAMES = "shcd"
 
-    def initialize value: -1, rank: 0, suit: 0, wild: 0
-        if value >= 0
-            @value = value
-        else
+    def initialize value: nil, rank: 0, suit: 0, wild: 0
+        if value.nil?
             @value = wild << 6 | suit << 4 | rank
+        else
+            @value = value
         end
     end
 
@@ -32,6 +39,18 @@ class ByteCard
     #bits, i.e. XX000000
     def wild
         @value >> 6 & (WILDS - 1)
+    end
+
+    #First of the two wild bits
+    #i.e. X0000000
+    def wild_bit1
+        @value >> 7 & 0x01
+    end
+    
+    #First of the two wild bits
+    #i.e. 0X000000
+    def wild_bit2
+        @value >> 6 & 0x01
     end
 
     def to_s
