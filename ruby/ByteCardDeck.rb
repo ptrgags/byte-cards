@@ -31,7 +31,7 @@ class ByteCardDeck
     #n - number of cards to draw.
     #returns a single ByteCard if n == 1, else returns
     #an array of ByteCards of length n
-    def draw n = 1
+    def draw_top n = 1
         if n == 1
             @deck.pop
         else
@@ -39,6 +39,8 @@ class ByteCardDeck
         end
     end
 
+    #Just in case we need to draw from 
+    #the bottom of the deck
     def draw_bottom n = 1
         if n == 1
             @deck.shift
@@ -47,6 +49,9 @@ class ByteCardDeck
         end
     end
 
+    #'draw a card' usually  means "draw from the top"
+    alias_method :draw, :draw_top
+
     def add_top cards
         @deck.push *cards
     end
@@ -54,6 +59,11 @@ class ByteCardDeck
     def add_bottom cards
         @deck.unshift *cards
     end
+
+    #This could probably go either way, but more often
+    #than not, decks are used like a queue. A discard
+    #pile might want this the other way.
+    alias_method :add, :add_bottom
 
     def to_s
         "Deck: #{@deck.length} cards remaining"
