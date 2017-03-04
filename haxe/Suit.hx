@@ -6,7 +6,8 @@ interface ISuit {
     // Get the short name of this suit like 'h'
     public var short_name(get, never):String;
     // Get a Unicode symbol for this suit like ♠.
-    // TODO: I need to learn how to encode Unicode properly in Haxe
+    // NOTE: I've had problems in Windows-based shells since they
+    // don't display UTF-8 correctly
     public var symbol(get, never):String;
 }
 
