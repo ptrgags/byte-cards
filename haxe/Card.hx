@@ -42,7 +42,7 @@ class PlayingCard implements ICard {
         return short_name;
     }
 
-    public static function all():Array<PlayingCard> {
+    static public function all():Array<PlayingCard> {
         var arr = new Array<PlayingCard>();
         for (suit in PlayingCardSuit.all()) {
             for (rank in PlayingCardRank.all()) {
