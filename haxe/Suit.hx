@@ -49,7 +49,6 @@ class PlayingCardSuit implements ISuit {
 
     public var symbol(get, never):String;
     public function get_symbol():String {
-        trace(SYMBOLS);
         return SYMBOLS[value];
     }
 

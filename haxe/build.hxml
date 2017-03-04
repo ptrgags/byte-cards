@@ -1,0 +1,3 @@
+# Build the main program and run it on the interpreter
+-main Main
+--interp

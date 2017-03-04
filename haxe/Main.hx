@@ -1,12 +1,11 @@
-import Suit;
-import Rank;
+import Card;
 
 class Main {
     static public function main():Void {
-        for (suit in PlayingCardSuit.all()) {
-            for (rank in PlayingCardRank.all()) {
-                trace('${rank}${suit} ${suit.symbol}');
-            }
+        for (card in PlayingCard.all()) {
+            //This only works in terminals with good UTF-8 support.
+            //(a.k.a. not Windows);
+            trace(card.symbol);
         }
     }
 }
