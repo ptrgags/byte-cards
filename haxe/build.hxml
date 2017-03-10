@@ -1,4 +1,4 @@
 # Build the main program and run it on the interpreter
--main Main
+-main high_low.Main
 -lib random
 --interp

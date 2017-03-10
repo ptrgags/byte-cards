@@ -1,3 +1,5 @@
+package byte_cards;
+
 interface ISuit {
     // Get the underlying value of this suit
     public var value(default, null):Int;

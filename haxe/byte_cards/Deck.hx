@@ -1,11 +1,14 @@
-import Card;
+package byte_cards;
+
 import Random;
+import byte_cards.Card;
 
 interface IDeck {
     //TODO: Add a lot more methods as needed. But design from higher up
     public var top(get, never):ICard;
     public var bottom(get, never):ICard;
     public var count(get, never):Int;
+    public var empty(get, never):Bool;
     public function draw_top(n:Int=1):ICard;
     public function shuffle():Void;
 }
@@ -18,6 +21,7 @@ class Deck implements IDeck {
     public var top(get, never):ICard;
     public var bottom(get, never):ICard;
     public var count(get, never):Int;
+    public var empty(get, never):Bool;
 
     public function new(cards:Array<ICard>) {
         this.cards = cards;
@@ -33,6 +37,10 @@ class Deck implements IDeck {
 
     public function get_count():Int {
         return cards.length;
+    }
+
+    public function get_empty():Bool {
+        return cards.length == 0;
     }
 
     public function draw_top(n:Int=1):ICard {

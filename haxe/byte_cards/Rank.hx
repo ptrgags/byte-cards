@@ -1,3 +1,5 @@
+package byte_cards;
+
 interface IRank {
     public var value(default, null):Int;
     public var name(get, never):String;

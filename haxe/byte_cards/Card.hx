@@ -1,5 +1,7 @@
-import Rank;
-import Suit;
+package byte_cards;
+
+import byte_cards.Rank;
+import byte_cards.Suit;
 
 interface ICard {
     public var rank(default, null):IRank;
