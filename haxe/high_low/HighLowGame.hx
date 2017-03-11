@@ -3,18 +3,22 @@ package high_low;
 import byte_cards.Card;
 import byte_cards.Deck;
 import byte_cards.CardComparator;
+import high_low.Player;
 
 class HighLowGame {
     private var deck:Deck;
     private var player_card:ICard;
     private var comparator:ICardComparator;
     private var turn_num:Int;
+    private var player:IPlayer;
 
     public function new() {
         deck = null;
         player_card = null;
         comparator = cast new AceHighCardComparator();
         turn_num = 0;
+        //player = cast new HumanPlayer();
+        player = cast new AIConstantGuess('higher');
     }
 
     public function setup() {
@@ -25,6 +29,11 @@ class HighLowGame {
         player_card = deck.draw_top();
     }
 
+    public function wait() {
+        Sys.println("Press Enter to continue...");
+        Sys.stdin().readLine();
+    }
+
     public function play() {
         setup();
         var should_continue = true;
@@ -33,6 +42,8 @@ class HighLowGame {
             turn_num++;
             Sys.println('== turn ${turn_num} ================');
             should_continue = turn();
+            if (player.is_human)
+                wait();
         }
         game_over();
     }
@@ -48,7 +59,7 @@ class HighLowGame {
         else if (cmp == 1)
             return "lower";
         else
-            return "same";
+            return "the same";
     }
 
     /**
@@ -66,7 +77,7 @@ class HighLowGame {
         Sys.println('Player\'s card: the ${player_card.name}');
 
         //Get a guess from the player
-        var guess = "higher";
+        var guess = player.make_guess(player_card);
 
         Sys.println('Player guessed that the next card will be ${guess}');
 
