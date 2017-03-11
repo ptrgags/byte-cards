@@ -28,7 +28,32 @@ class AIConstantGuess implements IPlayer {
     }
 }
 
-//TODO: AI that chooses based on the rank of the card
+/**
+ * AI that chooses based on the rank of the card. If it's at or below the
+ * midpoint, choose "higher". If it's above the midpoint, choose "lower".
+ *
+ * NOTE: This does not work when ace is high.
+ */
+class AIRankGuess implements IPlayer {
+    public var is_human(get, never):Bool;
+
+    public function new() {}
+
+    public function make_guess(card:ICard):String {
+        var min = card.min_rank.value;
+        var max = card.max_rank.value;
+        var midpoint = (min + max) / 2.0;
+        if (card.rank.value > midpoint)
+            return "lower";
+        else
+            return "higher";
+    }
+
+    public function get_is_human() {
+        return false;
+    }
+}
+
 //TODO: AI that chooses based on rank + counts cards
 
 /**

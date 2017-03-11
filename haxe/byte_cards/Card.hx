@@ -14,6 +14,8 @@ interface ICard {
     //NOTE: This doesn't display well in Windows-based terminals due to lack
     //of proper UTF-8 support
     public var symbol(get, never):String;
+    public var min_rank(get, never):IRank;
+    public var max_rank(get, never):IRank;
 }
 
 class PlayingCard implements ICard {
@@ -22,6 +24,8 @@ class PlayingCard implements ICard {
     public var name(get, never):String;
     public var short_name(get, never):String;
     public var symbol(get, never):String;
+    public var min_rank(get, never):IRank;
+    public var max_rank(get, never):IRank;
 
     public function new(rank:IRank, suit:ISuit) {
         this.rank = rank;
@@ -53,5 +57,21 @@ class PlayingCard implements ICard {
             }
         }
         return arr;
+    }
+
+    /**
+     * Minimum valid rank. This assumes
+     * ace is 1, not 14
+     */
+    public function get_min_rank():IRank {
+        return cast new PlayingCardRank(1); //Ace
+    }
+
+    /**
+     * Maximuum valid rank. This assumes
+     * ace is 1, not 14
+     */
+    public function get_max_rank():IRank {
+        return cast new PlayingCardRank(13); //King
     }
 }

@@ -15,10 +15,11 @@ class HighLowGame {
     public function new() {
         deck = null;
         player_card = null;
-        comparator = cast new AceHighCardComparator();
+        comparator = cast new CardComparator();
         turn_num = 0;
         //player = cast new HumanPlayer();
-        player = cast new AIConstantGuess('higher');
+        //player = cast new AIConstantGuess('higher');
+        player = cast new AIRankGuess();
     }
 
     public function setup() {
@@ -34,7 +35,7 @@ class HighLowGame {
         Sys.stdin().readLine();
     }
 
-    public function play() {
+    public function play():Int {
         setup();
         var should_continue = true;
         turn_num = 0;
@@ -46,6 +47,7 @@ class HighLowGame {
                 wait();
         }
         game_over();
+        return turn_num;
     }
 
     /**
