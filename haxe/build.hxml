@@ -1,4 +1,5 @@
 # Build the main program and run it on the interpreter
 -main high_low.Main
 -lib random
---interp
+-neko high_low/neko_bin/high_low.n
+-cmd neko high_low/neko_bin/high_low.n high_low/config.json
