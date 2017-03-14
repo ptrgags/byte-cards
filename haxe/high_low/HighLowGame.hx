@@ -12,14 +12,12 @@ class HighLowGame {
     private var turn_num:Int;
     private var player:IPlayer;
 
-    public function new() {
+    public function new(player:IPlayer) {
         deck = null;
         player_card = null;
         comparator = cast new CardComparator();
         turn_num = 0;
-        //player = cast new HumanPlayer();
-        //player = cast new AIConstantGuess('higher');
-        player = cast new AIRankGuess();
+        this.player = player;
     }
 
     public function setup() {
@@ -35,13 +33,22 @@ class HighLowGame {
         Sys.stdin().readLine();
     }
 
+    /**
+     * Print a line to standard outpuut only if the
+     * player is a human and thus is playing interactively
+     */
+    public function human_print(message:String) {
+        if (player.is_human)
+            Sys.println(message);
+    }
+
     public function play():Int {
         setup();
         var should_continue = true;
         turn_num = 0;
         while (!deck.empty && should_continue) {
             turn_num++;
-            Sys.println('== turn ${turn_num} ================');
+            human_print('== turn ${turn_num} ================');
             should_continue = turn();
             if (player.is_human)
                 wait();
@@ -76,12 +83,12 @@ class HighLowGame {
      * and therefore lost
      */
     public function turn():Bool {
-        Sys.println('Player\'s card: the ${player_card.name}');
+        human_print('Player\'s card: the ${player_card.name}');
 
         //Get a guess from the player
         var guess = player.make_guess(player_card);
 
-        Sys.println('Player guessed that the next card will be ${guess}');
+        human_print('Player guessed that the next card will be ${guess}');
 
         //Draw a new card
         var new_card = deck.draw_top();
@@ -89,21 +96,21 @@ class HighLowGame {
         //Compare the cards.
         var actual = compare_cards(player_card, new_card);
 
-        Sys.println('The next card is the ${new_card.name}, which is ${actual}');
+        human_print('The next card is the ${new_card.name}, which is ${actual}');
 
         //Check if the guess is correct
         if (guess == actual) {
-            Sys.println("Player's guess was correct!");
+            human_print("Player's guess was correct!");
             player_card = new_card;
             return true;
         } else {
-            Sys.println("Sorry, the player's guess was incorrect");
+            human_print("Sorry, the player's guess was incorrect");
             return false;
         }
     }
 
     public function game_over() {
-        Sys.println('== Game Over! ============');
+        human_print('== Game Over! ============');
         Sys.println('Player lasted ${turn_num} turn(s).');
     }
 }

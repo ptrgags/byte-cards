@@ -24,12 +24,14 @@ class ConfigLoader {
 class Main {
     static public function main():Void {
         //Load config
-        var conf_fname = Sys.args()[0];
-        var loader = new ConfigLoader(conf_fname);
+        var loader = new ConfigLoader("high_low/config.json");
         var config = loader.load();
 
+        //Get the player
+        var player = new PlayerSelect().get_player(config.player_type);
+
         //Play games over and over again
-        var game = new HighLowGame();
+        var game = new HighLowGame(player);
         var total_turns = 0.0;
         var N = config.num_games;
         for (i in 0...N) {
