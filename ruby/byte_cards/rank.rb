@@ -70,6 +70,14 @@ class PlayingCardRank < Rank
         @@SHORT_NAMES[@value] || @value.to_s
     end
 
+    def self.min_rank
+        PlayingCardRank.new @@MIN_RANK
+    end
+
+    def self.max_rank
+        PlayingCardRank.new @@MAX_RANK
+    end
+
     def self.all
         (@@MIN_RANK..@@MAX_RANK).map {|x| self.new x}
     end
@@ -87,6 +95,14 @@ class ByteCardRank < Rank
         @value.to_s(16).upcase
     end
 
+    def self.min_rank
+        ByteCardRank.new @@MIN_RANK
+    end
+
+    def self.max_rank
+        ByteCardRank.new @@MAX_RANK
+    end
+
     def self.all
         (@@MIN_RANK..@@MAX_RANK).map {|x| self.new x}
     end
@@ -95,6 +111,14 @@ end
 class FruitRank < Rank
     @@MIN_RANK = 1
     @@MAX_RANK = 8
+
+    def self.min_rank
+        FruitRank.new @@MIN_RANK
+    end
+
+    def self.max_rank
+        FruitRank.new @@MAX_RANK
+    end
 
     def self.all
         (@@MIN_RANK..@@MAX_RANK).map {|x| self.new x}

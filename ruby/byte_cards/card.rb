@@ -22,6 +22,14 @@ class Card
         "#{@rank.short_name}#{@suit.symbol}"
     end
 
+    def min_rank
+        @rank.class.min_rank
+    end
+
+    def max_rank
+        @rank.class.max_rank
+    end
+
     def to_s
         symbol
     end

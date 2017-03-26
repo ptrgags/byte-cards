@@ -2,9 +2,10 @@ require_relative "../byte_cards/deck"
 require_relative "../byte_cards/card_comparator"
 
 class HighLowGame
-    def initialize player, card_type
+    def initialize player, card_type, console
         @player = player
         @card_type = card_type
+        @console = console
         @deck = nil
         @player_card = nil
         @correct_count = 0
@@ -40,18 +41,18 @@ class HighLowGame
         actual = compare_cards @player_card, new_card
 
         if guess == actual
-            puts "Correct!"
+            @console.println "Correct!"
             @correct_count += 1
             @player_card = new_card
         else 
-            puts "Incorrect! The next card was #{actual}"
+            @console.println "Incorrect! The next card was #{actual}"
             @should_continue = false
         end
     end
 
     def game_over
-        puts "Game Over!"
-        puts "Player got #{@correct_count} guesses correct!"
+        @console.println "Game Over!"
+        @console.println "Player got #{@correct_count} guesses correct!", false
     end
 
     def play
